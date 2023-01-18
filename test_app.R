@@ -16,8 +16,8 @@ data$genero <- as.factor(data$genero)
 data$departamento <- as.factor(data$departamento)
 
 # Choices for UI inputs
-ch_genero <- unique(data$genero[!is.na(data$genero)])
-ch_departamento <- unique(data$departamento[!is.na(data$departamento)])
+#ch_genero <- unique(data$genero[!is.na(data$genero)])
+#ch_departamento <- unique(data$departamento[!is.na(data$departamento)])
 
 
 
@@ -27,20 +27,20 @@ ch_departamento <- unique(data$departamento[!is.na(data$departamento)])
 
 ui <- panelsPage(
   
-  panel(title = "Filtros",
+  shinypanels::panel(title = "Filtros",
         color = "lightgreen",
         collapsed = FALSE,
         body = div(
-          uiOutput("controls")
+          shiny::uiOutput("controls")
         ),
         width = 350,
         footer = NULL),
   
-  panel(title = "Visualización",
+  shinypanels::panel(title = "Visualización",
         color = "green",
         collapsed = FALSE,
-        body = plotOutput("barplot"))
-  #body = textOutput("barplot"))
+        body = shiny::plotOutput("viz"))
+  #body = textOutput("viz"))
 )
 
 
@@ -55,6 +55,28 @@ server <- function(input, output, session) {
     ch_variable <- c("genero", "departamento")
   })
   
+  # opciones para parmesan ------------------------------------------
+  
+  pickerOpts <- reactive({
+    list(
+      `actions-box` = TRUE,
+      `deselect-all-text` = "Ninguno",
+      `select-all-text` = "Todos",
+      title = "Todos"
+    )
+  })
+  
+  ch_genero <- reactive({
+    unique(data$genero)
+  })
+  
+  ch_tipo_lider <- reactive({
+    unique(data$tipo_lider)
+  })
+  
+  ch_departamento <- reactive({
+    unique(data$departamento)
+  })
   
   # Renderizar inputs con parmesan ------------------------------------------
   
