@@ -1,38 +1,10 @@
 ---
-# generoId:
-#   show: true
-#   input_type: pickerInput
-#   input_params:
-#     label: Género
-#     choices: ch_genero()
-#     #selected: defaultType()
-#     multiple: false
-#     #options: pickerOpts()
-# tipo_liderId:
-#   show: true
-#   input_type: pickerInput
-#   input_params:
-#     label: Tipo de líder
-#     choices: ch_tipo_lider()
-#     #selected: tipo_lider()
-#     multiple: false
-#     #options: pickerOpts()
-# departamentoId:
-#   show: true
-#   input_type: pickerInput
-#   input_params:
-#     label: Departamento
-#     choices: ch_departamento()
-#     #selected: tipo_lider()
-#     multiple: false
-#     #options: pickerOpts()
-#     
-variablesId:
+departamentoId:
   show: true
-  input_type: pickerInput
+  input_type: selectizeInput
   input_params:
-    label: Variables
-    choices: ch_variables()
-    #selected: defaultType()
-    multiple: false
-    #options: pickerOpts()
+    label: Departamento
+    choices: dept_opc()
+    multiple: true
+    options: 
+      placeholder: "Todos"

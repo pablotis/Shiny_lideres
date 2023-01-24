@@ -33,7 +33,8 @@ ui <- panelsPage(
         collapsed = FALSE,
         body = div(
           uiOutput("select_genero"),
-          uiOutput("select_depto")
+          uiOutput("select_depto"),
+          uiOutput("select_date")
         ),
         width = 350,
         footer = NULL),
@@ -53,31 +54,52 @@ ui <- panelsPage(
 
 server <- function(input, output, session) {
   
-  opc_variables <- reactive({
-    ch_variable <- c("genero", "departamento")
-  })
-  
 
-### Salida del panel de seleccion
+  #..................Selector para variable genero.................
   output$select_genero <- renderUI({
     
-    selectizeInput(inputId = "genero", "Variable",
+    selectizeInput(inputId = "opc_genero", "Variable",
                    choices = ch_genero)
   })
-  
+
+  #..............Selector para variable departamento...............
   output$select_depto <- renderUI({
     
-    selectizeInput(inputId = "depto", "Variable",
+    selectizeInput(inputId = "opc_depto", "Variable",
                    choices = ch_depto)
   })
-
-### Salida de la tabla - Referencia al body del panel 2 (table)
+  
+  
+  #..................Selector para variable fecha..................
+  output$select_date <- renderUI({
+    shinyinvoer::dateRangeInput(
+      inputId = "date_range",
+      label = 'Seleccione el rango de fechas',
+      start = '2016-01-02',
+      end = '2020-06-31',
+      min = '2016-01-02',
+      max = '2020-06-31',
+      startLabel = 'Fecha inicial',
+      endLabel = 'Fecha final',
+      resetLabel = 'Restablecer fechas',
+      locale = 'es'
+    )
+  })
+  
+  # output$the_output <- renderPrint({
+  #   input$date_range
+  # })
+  
+  
+  ### Salida de la tabla - Referencia al body del panel 2 (table)
   output$table <- renderTable({
     
     data |>
       select(nombre, fecha, movil, genero, departamento) |> 
-      filter(genero == input$genero,
-             departamento == input$depto)
+      filter(genero == input$opc_genero,
+             departamento == input$opc_depto,
+             !is.na(fecha),
+             (fecha >= input$date_range$startLabel & fecha <= input$date_range$endLabel))
   })
     
 }

@@ -1,8 +1,5 @@
 filtros:
   label:
   inputs:
-    # - generoId
-    # - tipo_liderId
-    # - departamentoId
-    - variablesId
+    - departamentoId
 
