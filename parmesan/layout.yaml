@@ -2,4 +2,5 @@ filtros:
   label:
   inputs:
     - departamentoId
+    - generoId
 

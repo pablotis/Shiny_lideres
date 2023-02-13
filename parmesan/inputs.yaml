@@ -8,3 +8,13 @@ departamentoId:
     multiple: true
     options: 
       placeholder: "Todos"
+generoId:
+  show: true
+  input_type: selectizeInput
+  input_params:
+    label: Género
+    choices: genero_opc()
+    multiple: true
+    options:
+      placeholder: "Todos"
+

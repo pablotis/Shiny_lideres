@@ -14,6 +14,7 @@ library(lfltmagic)
 library(hgchmagic)
 library(DT)
 library(leaflet)
+library(makeup)
 
 
 ##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -127,6 +128,7 @@ server <- function(input, output, session) {
   
   viz_save <- reactive({
     req(data_viz())
+    print(data_viz())
     df <- data_viz()
     
     ## Salida para Tabla
@@ -138,7 +140,7 @@ server <- function(input, output, session) {
     }
     ## Salida para barras
     if(input$viz_selection == "bar"){
-      viz <- hgchmagic::hgch_bar_Cat(df, map_name = "col_larg")
+      viz <- ggplot2::ggplot(df) + geom_bar()
     }
     viz
   })
@@ -164,7 +166,7 @@ server <- function(input, output, session) {
   
   ### Convoco los gráficos renderizados
   output$viz <- renderUI({
-    req(input$viz_selection)
+    #req(input$viz_selection)
     
     if(input$viz_selection == "bar"){
       highcharter::highchartOutput("hgch_viz")
