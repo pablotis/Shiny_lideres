@@ -37,7 +37,8 @@ ui <- panelsPage(
         collapsed = FALSE,
         body = div(
           # Acá sección donde van a ir las visualizaciones, en función de los iconitos
-          uiOutput("viz")
+          verbatimTextOutput("test")
+          #uiOutput("viz")
         )
         #body = textOutput("barplot"))
   )
@@ -120,89 +121,88 @@ server <- function(input, output, session) {
   data_filter <- reactive({
     req(data_load())
     df <- data_load()
-    
-    #print(input$departamentoId)
-    
-    if(is.null(input$departamentoId)){
-      df <- df
-      
-    } else {
-      df <- data_load() |> dplyr::filter(departamento %in% input$departamentoId)
-      }
+    depto <- input$departamentoId
+    genero_sel <- input$generoId
+    print(genero_sel)
+    if (!is.null(depto)) df <- df |> filter(departamento %in% depto)
+    if (!is.null(genero_sel)) df <- df |> filter(genero %in% genero_sel)
     df
   })
-  
-  
-  
-  
-  ##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  ##                                  PASO IV                                 ----
-  ##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  
-  # Datos para visualizar
-  
-  data_viz <- reactive({
-    
-    req(data_filter())
-    req(input$viz_selection) # Este es el esqueleto de los iconitos
-    
-    df <- data_filter()
-    
-    if(input$viz_selection == "map") {
-      df <- df |> select(departamento)
-    }
 
+
+  output$test <- renderPrint({
+    data_filter()
   })
-  
-  
-  ##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  ##                                   PASO V                                 ----
-  ##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  
-  # Gráficos
-  
-  viz_save <- reactive({
-    req(data_viz())
-    
-    df <- data_viz()
-    
-    ## Salida para mapa
-    if(input$viz_selection == "map"){
-      viz <- lfltmagic::lflt_choropleth_Gnm(df, map_name = "col_larg")
-      
-    }
-    
-    viz
-    
-  })
-  
-  
-  
-  
-  ##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  ##                                  PASO VI                                 ----
-  ##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  
-  ### Renderizo los gráficos
-  
-  output$lflt_viz <- leaflet::renderLeaflet({
-    if(input$viz_selection != "map") return()
-    viz_save()
-  })
-
-
-  # Genero Output a partir del render creado anteriormente
-  output$viz <- renderUI({
-    
-    if(is.null(input$viz_selection)) return()
-    
-
-    if(input$viz_selection == "map"){
-      leaflet::leafletOutput("lflt_viz")
-    }
-      
-
-    })
+  # 
+  # 
+  # ##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  # ##                                  PASO IV                                 ----
+  # ##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  # 
+  # # Datos para visualizar
+  # 
+  # data_viz <- reactive({
+  #   
+  #   req(data_filter())
+  #   req(input$viz_selection) # Este es el esqueleto de los iconitos
+  #   
+  #   df <- data_filter()
+  #   
+  #   if(input$viz_selection == "map") {
+  #     df <- df |> select(departamento)
+  #   }
+  # 
+  # })
+  # 
+  # 
+  # ##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  # ##                                   PASO V                                 ----
+  # ##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  # 
+  # # Gráficos
+  # 
+  # viz_save <- reactive({
+  #   req(data_viz())
+  #   
+  #   df <- data_viz()
+  #   
+  #   ## Salida para mapa
+  #   if(input$viz_selection == "map"){
+  #     viz <- lfltmagic::lflt_choropleth_Gnm(df, map_name = "col_larg")
+  #     
+  #   }
+  #   
+  #   viz
+  #   
+  # })
+  # 
+  # 
+  # 
+  # 
+  # ##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  # ##                                  PASO VI                                 ----
+  # ##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  # 
+  # ### Renderizo los gráficos
+  # 
+  # output$lflt_viz <- leaflet::renderLeaflet({
+  #   if(input$viz_selection != "map") return()
+  #   viz_save()
+  # })
+  # 
+  # 
+  # # Genero Output a partir del render creado anteriormente
+  # output$viz <- renderUI({
+  #   
+  #   if(is.null(input$viz_selection)) return()
+  #   
+  # 
+  #   if(input$viz_selection == "map"){
+  #     leaflet::leafletOutput("lflt_viz")
+  #   }
+  #     
+  # 
+  #   })
   
 }
 
