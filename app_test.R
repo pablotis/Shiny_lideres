@@ -78,11 +78,11 @@ server <- function(input, output, session) {
   })
   
   
-  ##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  ##                                  PASO II                                 ----
-  ##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   
-  ### Cargo base de datos en versión "reactiva"
+  #                    CARGO BASE DE TRABAJO                    ~~~
+  #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  
+  
   data_load <- reactive({
     df <- data.table::fread("data/lideres.csv") |> 
       filter(!is.na(genero))
@@ -90,7 +90,11 @@ server <- function(input, output, session) {
     df
   })
   
-  # Defino de forma reactiva las diferentes opciones de departamentos a seleccionar en filtros
+  
+  #     ARMO OPCIONES DE INTERACCION EN PANEL DE 'controls'     ~~~
+  #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  
+  
   dept_opc <- reactive({
     req(data_load())
     unique(data_load()$departamento)
@@ -102,6 +106,11 @@ server <- function(input, output, session) {
   })
   
   
+
+  
+  #          SETEO DE INPUTS PARA EL PANEL 'Controls'           ~~~
+  #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  
   ### Seteo parmesan para definición de filtros
   parmesan <- parmesan_load()
   parmesan_input <- parmesan_watch(input, parmesan)
@@ -110,12 +119,10 @@ server <- function(input, output, session) {
                   input = input, output = output, session = session,
                   env = environment())
   
+
+  #                      FILTRADO DE CASOS                      ~~~
+  #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   
-  
-  
-  ##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  ##                                  PASO III                                ----
-  ##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   
   ### Base reactiva en función de filtros
   data_filter <- reactive({
@@ -132,12 +139,12 @@ server <- function(input, output, session) {
   })
 
 
-  # ##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  # ##                                  PASO IV                                 ----
-  # ##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  # 
-  # # Datos para visualizar
-  # 
+
+#                    SELECCION DE VARIABLES                   ~~~
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+# 
   data_viz <- reactive({
 
     req(data_filter())
@@ -156,63 +163,23 @@ server <- function(input, output, session) {
     df
 
   })
-  # 
-  # 
-  # ##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  # ##                                   PASO V                                 ----
-  # ##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  # 
-  # # Gráficos
-  # 
-  # viz_save <- reactive({
-  #   req(data_viz())
-  #   
-  #   df <- data_viz()
-  #   
-  #   ## Salida para mapa
-  #   if(input$viz_selection == "map"){
-  #     viz <- lfltmagic::lflt_choropleth_Gnm(df, map_name = "col_larg")
-  #     
-  #   }
-  #   
-  #   viz
-  #   
-  # })
-  # 
-  # 
-  # 
-  # 
-  # ##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  # ##                                  PASO VI                                 ----
-  # ##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  # 
-  # ### Renderizo los gráficos
-  # 
-  # output$lflt_viz <- leaflet::renderLeaflet({
-  #   if(input$viz_selection != "map") return()
-  #   viz_save()
-  # })
+  
+  
+  
+  ##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  ##                        ARMO GRAFICO -familia render-                     ----
+  ##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   
   output$test <- renderPrint({
     data_viz()
   })
   
-  # 
-  # 
-  # # Genero Output a partir del render creado anteriormente
-  # output$viz <- renderUI({
-  #   
-  #   if(is.null(input$viz_selection)) return()
-  #   
-  # 
-  #   if(input$viz_selection == "map"){
-  #     leaflet::leafletOutput("lflt_viz")
-  #   }
-  #     
-  # 
-  #   })
 
-
+  
+  ##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  ##                      MUESTRO GRAFICO -familia Output-                    ----
+  ##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  
   output$viz <- renderUI({
     verbatimTextOutput("test")
   })
