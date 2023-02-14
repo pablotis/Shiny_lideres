@@ -79,7 +79,14 @@ server <- function(input, output, session) {
   ### Cargo base de datos en versión "reactiva"
   data_load <- reactive({
     df <- data.table::fread("data/lideres.csv") |> 
-      filter(!is.na(genero))
+      filter(!is.na(genero)) |> 
+      filter(!is.na(fecha)) |> 
+      mutate(
+        fecha = as.Date(fecha),
+        mes = lubridate::month(fecha),
+        anio = lubridate::year(fecha),
+        periodo = paste(anio, mes, sep = "-")) |> 
+      select(-c(mes, anio))
     
     df
   })
@@ -147,6 +154,10 @@ server <- function(input, output, session) {
       df <- df |> select(genero)
     }
     
+    if(input$viz_selection == "line") {
+      df <- df |> select(periodo)
+    }
+    
     df
     
   })
@@ -161,13 +172,22 @@ server <- function(input, output, session) {
     ## Salida para mapa
     if(input$viz_selection == "map"){
       viz <- lfltmagic::lflt_choropleth_Gnm(df, map_name = "col_larg")
+      
     } else if(input$viz_selection == "bar"){
-      #viz <- highcharter::highchart(df)
       viz <- df |> 
         select(genero) |> 
         ggplot() +
         geom_bar(aes(x = genero), 
                        stat = "count")
+      
+    } else if(input$viz_selection == "table"){
+      viz <- DT::datatable(df)
+      
+    } else if(input$viz_selection == "line"){
+      viz <- df |> 
+        count(periodo) |>  
+        ggplot() +
+        geom_line(aes(x = periodo, y = n, group = ""))
     }
     
     viz
@@ -187,13 +207,18 @@ server <- function(input, output, session) {
     viz_save()
   })
   
-  # output$bar_viz <- highcharter::renderHighchart({
-  #   if(input$viz_selection != "bar") return()
-  #   viz_save()
-  # })
-  
   output$bar_viz <- renderPlot({
     if(input$viz_selection != "bar") return()
+    viz_save()
+  })
+  
+  output$table_viz <- DT::renderDT({
+    if(input$viz_selection != "table") return()
+    viz_save()
+  })
+  
+  output$line_viz <- renderPlot({
+    if(input$viz_selection != "line") return()
     viz_save()
   })
   
@@ -209,9 +234,15 @@ server <- function(input, output, session) {
     
     if(input$viz_selection == "map"){
       leaflet::leafletOutput("lflt_viz")
+      
     } else if(input$viz_selection == "bar"){
-      #highcharter::highchartOutput("bar_viz")
       plotOutput("bar_viz")
+      
+    } else if(input$viz_selection == "table"){
+      DT::DTOutput("table_viz")
+      
+    } else if(input$viz_selection == "line"){
+      plotOutput("line_viz")
     }
     
   })
