@@ -37,8 +37,8 @@ ui <- panelsPage(
         collapsed = FALSE,
         body = div(
           # Acá sección donde van a ir las visualizaciones, en función de los iconitos
-          verbatimTextOutput("test")
-          #uiOutput("viz")
+          #verbatimTextOutput("test")
+          uiOutput("viz")
         )
         #body = textOutput("barplot"))
   )
@@ -121,38 +121,41 @@ server <- function(input, output, session) {
   data_filter <- reactive({
     req(data_load())
     df <- data_load()
+    
     depto <- input$departamentoId
     genero_sel <- input$generoId
-    print(genero_sel)
+    
+    #print(genero_sel)
     if (!is.null(depto)) df <- df |> filter(departamento %in% depto)
     if (!is.null(genero_sel)) df <- df |> filter(genero %in% genero_sel)
     df
   })
 
 
-  output$test <- renderPrint({
-    data_filter()
-  })
-  # 
-  # 
   # ##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   # ##                                  PASO IV                                 ----
   # ##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   # 
   # # Datos para visualizar
   # 
-  # data_viz <- reactive({
-  #   
-  #   req(data_filter())
-  #   req(input$viz_selection) # Este es el esqueleto de los iconitos
-  #   
-  #   df <- data_filter()
-  #   
-  #   if(input$viz_selection == "map") {
-  #     df <- df |> select(departamento)
-  #   }
-  # 
-  # })
+  data_viz <- reactive({
+
+    req(data_filter())
+    req(input$viz_selection) # Este es el esqueleto de los iconitos
+
+    df <- data_filter()
+
+    if(input$viz_selection == "map") {
+      df <- df |> select(departamento)
+    }
+    
+    if(input$viz_selection == "bar") {
+      df <- df |> select(genero)
+    }
+    
+    df
+
+  })
   # 
   # 
   # ##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -189,6 +192,11 @@ server <- function(input, output, session) {
   #   if(input$viz_selection != "map") return()
   #   viz_save()
   # })
+  
+  output$test <- renderPrint({
+    data_viz()
+  })
+  
   # 
   # 
   # # Genero Output a partir del render creado anteriormente
@@ -203,6 +211,11 @@ server <- function(input, output, session) {
   #     
   # 
   #   })
+
+
+  output$viz <- renderUI({
+    verbatimTextOutput("test")
+  })
   
 }
 
