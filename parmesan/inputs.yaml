@@ -1,5 +1,5 @@
 ---
-departamentoId:
+departamento:
   show: true
   input_type: selectizeInput
   input_params:
@@ -8,7 +8,7 @@ departamentoId:
     multiple: true
     options: 
       placeholder: "Todos"
-generoId:
+genero:
   show: true
   input_type: selectizeInput
   input_params:

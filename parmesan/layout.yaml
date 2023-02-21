@@ -1,6 +1,6 @@
 filtros:
   label:
   inputs:
-    - departamentoId
-    - generoId
+    - departamento
+    - genero
 
